@@ -1,0 +1,8 @@
+# A sample Gemfile
+source "http://rubygems.org"
+
+gem "handlersocket"
+gem "mysql2", '0.2.18'
+gem "memcache-client", "1.7.2" 
+gem 'system_timer'
+gem 'redis', '2.2.2'
