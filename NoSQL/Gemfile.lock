@@ -1,0 +1,18 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    handlersocket (0.0.2)
+    memcache-client (1.7.2)
+    mysql2 (0.2.18)
+    redis (2.2.2)
+    system_timer (1.2.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  handlersocket
+  memcache-client (= 1.7.2)
+  mysql2 (= 0.2.18)
+  redis (= 2.2.2)
+  system_timer
