@@ -191,8 +191,8 @@ print "Wait... "
 end
 puts
 
-Benchmark.bm(20) do |rep|
-  rep.report("mysql2") do
+Benchmark.bm(40) do |rep|
+  rep.report("mysql2(#{options[:threads]}process)") do
     options[:threads].times do |n|
       Process.fork() {
         mysql = KvsBenchmarker::MySQLBench.new({
@@ -213,7 +213,7 @@ Benchmark.bm(20) do |rep|
     Process.waitall
   end
 
-  rep.report("HandlerSocket(single)") do
+  rep.report("HandlerSocket(#{options[:threads]}process)") do
     options[:threads].times do |n|
       Process.fork() {
         hs = KvsBenchmarker::HandlerSocketBench.new({
@@ -235,7 +235,7 @@ Benchmark.bm(20) do |rep|
     Process.waitall
   end
 
-  rep.report("redis(single)") do
+  rep.report("redis(#{options[:threads]}process)") do
     options[:threads].times do |n|
       Process.fork() {
         redis = KvsBenchmarker::RedisBench.new({
