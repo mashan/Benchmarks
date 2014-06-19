@@ -60,6 +60,7 @@ module KvsBenchmarker
       )
       @table = options[:table]
       @sample= options[:sample]
+      @sample_datas = options[:sample].samples
     end
 
     def drop_data
@@ -80,11 +81,23 @@ create table #{@table} (
 
     def get
       sql = "SELECT * FROM #{@table} WHERE #{@sample.key_name} = #{rand(@sample.size + 1)}"
-      @client.query(sql, :as => :array, :cache_rows => false, :cast => false)
+      query(sql)
+    end
+
+    def set
+      @sample_datas.each do |row|
+        sql = "INSERT INTO #{@table} VALUES ( '', '#{row.last}')"
+        query(sql)
+      end
     end
 
     def close
       @client.close
+    end
+
+    private
+    def query(sql)
+      @client.query(sql, :as => :array, :cache_rows => false, :cast => false)
     end
   end
 
@@ -94,24 +107,23 @@ create table #{@table} (
       @database = options[:database]
       @table    = options[:table]
       @sample   = options[:sample]
-      @sample_datas = Marshal.load(Marshal.dump(options[:sample].samples))
+      @sample_datas = options[:sample].samples
+      @index_id = rand(options[:sample].samples.size)
+      @hs.open_index(@index_id, @database, @table, 'PRIMARY', "#{@sample.colomn_names.join(',')}") 
     end
 
     def get
-      @hs.open_index(1, @database, @table, 'PRIMARY', "#{@sample.colomn_names.join(',')}") 
-      @hs.execute_single(1, '=', [rand(@sample.size + 1)], 1, 0)
+      @hs.execute_single(@index_id, '=', [rand(@sample.size + 1)], 1, 0)
     end
 
     def get_multi
-      @hs.open_index(2, @database, @table, 'PRIMARY', "#{@sample.colomn_names.join(',')}") 
-      condition = [ [2, '=', [rand(@sample.size + 1)], 1, 0] ]
-      hs.execute_multi(condition)
+      condition = [ [@index_id, '=', [rand(@sample.size + 1)], 1, 0] ]
+      @hs.execute_multi(condition)
     end
 
     def set
-      @hs.open_index(3, @database, @table, 'PRIMARY', "#{@sample.colomn_names.join(',')}") 
       @sample_datas.each do |row|
-        @hs.execute_insert(3, ["#{row.first}","#{row.last}"])
+        @hs.execute_insert(@index_id, ["#{row.first}","#{row.last}"])
       end
     end
 
@@ -123,7 +135,7 @@ create table #{@table} (
   class RedisBench
     def initialize(options = {})
       @redis = Redis.new
-      @sample_datas = Marshal.load(Marshal.dump(options[:sample].samples))
+      @sample_datas = options[:sample].samples
     end
 
     def drop_data

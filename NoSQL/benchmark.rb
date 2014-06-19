@@ -50,111 +50,111 @@ end
 
 sample = KvsBenchmarker::Sample.new({:size => options[:size]})
 
-# ####################
-# # INSERT BENCHMARK #
-# ####################
-# puts "'set(insert)' benchmark..."
-# mysql = KvsBenchmarker::MySQLBench.new ({
-#   :host     => options[:host],
-#   :port     => 3306,
-#   :database => DB_NAME,
-#   :username => 'root',
-#   :table    => TABLE_NAME,
-#   :sample   => sample
-# })
-# 
-# hs = KvsBenchmarker::HandlerSocketBench.new({
-#   :host     => options[:host],
-#   :port     => HS_RW_PORT,
-#   :database => DB_NAME,
-#   :table    => TABLE_NAME,
-#   :sample   => sample
-# })
-# 
-# redis = KvsBenchmarker::RedisBench.new({
-#   :host     => options[:host],
-#   :port     => MEMCACHE_PORT,
-#   :sample => sample
-# })
-# 
-# Benchmark.bm(30) do |rep|
-#   mysql.drop_data
-#   rep.report("mysql2") do
-#     mysql.set
-#   end
-# 
-#   mysql.drop_data
-#   rep.report("HandlerSocket(single)") do
-#     id = rand(10000)
-#     hs.set
-#   end
-# 
-#   redis.drop_data
-#   rep.report("redis(single)") do
-#     redis.set
-#   end
-# end
-# 
-# mysql.close
-# hs.close
-# redis.close
+####################
+# INSERT BENCHMARK #
+####################
+puts "'set(insert)' benchmark..."
+mysql = KvsBenchmarker::MySQLBench.new ({
+  :host     => options[:host],
+  :port     => 3306,
+  :database => DB_NAME,
+  :username => 'root',
+  :table    => TABLE_NAME,
+  :sample   => sample
+})
 
-# ####################
-# # SELECT BENCHMARK #
-# ####################
-# puts "get benchmark..."
-# mysql = KvsBenchmarker::MySQLBench.new ({
-#   :host     => options[:host],
-#   :port     => 3306,
-#   :database => DB_NAME,
-#   :username => 'root',
-#   :table    => TABLE_NAME,
-#   :sample   => sample
-# })
-# 
-# redis = KvsBenchmarker::RedisBench.new({
-#   :host   => options[:host],
-#   :sample => sample
-# })
-# 
-# puts "Preparing data..."
-# puts "\t MySQL..."
-# mysql.setup
-# puts "\t Redis..."
-# redis.setup
-# 
-# hs = KvsBenchmarker::HandlerSocketBench.new({
-#   :host     => options[:host],
-#   :port     => HS_RO_PORT,
-#   :database => DB_NAME,
-#   :table    => TABLE_NAME,
-#   :sample   => sample
-# })
-# 
-# Benchmark.bm(30) do |rep|
-# 
-#   rep.report("mysql2") do
-#     options[:size].times do 
-#       mysql.get
-#     end
-#   end
-# 
-#   rep.report("HandlerSocket(single)") do
-#     options[:size].times do 
-#       hs.get
-#     end
-#   end
-# 
-#   rep.report("redis(single)") do
-#     options[:size].times do 
-#       redis.get
-#     end
-#   end
-# end
-# 
-# mysql.close
-# hs.close
-# redis.close
+hs = KvsBenchmarker::HandlerSocketBench.new({
+  :host     => options[:host],
+  :port     => HS_RW_PORT,
+  :database => DB_NAME,
+  :table    => TABLE_NAME,
+  :sample   => sample
+})
+
+redis = KvsBenchmarker::RedisBench.new({
+  :host     => options[:host],
+  :port     => MEMCACHE_PORT,
+  :sample => sample
+})
+
+Benchmark.bm(30) do |rep|
+  mysql.drop_data
+  rep.report("mysql2") do
+    mysql.set
+  end
+
+  mysql.drop_data
+  rep.report("HandlerSocket(single)") do
+    id = rand(10000)
+    hs.set
+  end
+
+  redis.drop_data
+  rep.report("redis(single)") do
+    redis.set
+  end
+end
+
+mysql.close
+hs.close
+redis.close
+
+####################
+# SELECT BENCHMARK #
+####################
+puts "get benchmark..."
+mysql = KvsBenchmarker::MySQLBench.new ({
+  :host     => options[:host],
+  :port     => 3306,
+  :database => DB_NAME,
+  :username => 'root',
+  :table    => TABLE_NAME,
+  :sample   => sample
+})
+
+redis = KvsBenchmarker::RedisBench.new({
+  :host   => options[:host],
+  :sample => sample
+})
+
+puts "Preparing data..."
+puts "\t MySQL..."
+mysql.setup
+puts "\t Redis..."
+redis.setup
+
+hs = KvsBenchmarker::HandlerSocketBench.new({
+  :host     => options[:host],
+  :port     => HS_RO_PORT,
+  :database => DB_NAME,
+  :table    => TABLE_NAME,
+  :sample   => sample
+})
+
+Benchmark.bm(30) do |rep|
+
+  rep.report("mysql2") do
+    options[:size].times do 
+      mysql.get
+    end
+  end
+
+  rep.report("HandlerSocket(single)") do
+    options[:size].times do 
+      hs.get
+    end
+  end
+
+  rep.report("redis(single)") do
+    options[:size].times do 
+      redis.get
+    end
+  end
+end
+
+mysql.close
+hs.close
+redis.close
 
 
 #############################
