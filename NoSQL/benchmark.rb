@@ -54,7 +54,7 @@ sample = KvsBenchmarker::Sample.new({:size => options[:size]})
 # INSERT BENCHMARK #
 ####################
 puts "'set(insert)' benchmark..."
-mysql = KvsBenchmarker::MySQLBench.new ({
+mysql = KvsBenchmarker::MySQLBench.new({
   :host     => options[:host],
   :port     => 3306,
   :database => DB_NAME,
@@ -103,7 +103,7 @@ redis.close
 # SELECT BENCHMARK #
 ####################
 puts "get benchmark..."
-mysql = KvsBenchmarker::MySQLBench.new ({
+mysql = KvsBenchmarker::MySQLBench.new({
   :host     => options[:host],
   :port     => 3306,
   :database => DB_NAME,
@@ -255,4 +255,80 @@ Benchmark.bm(40) do |rep|
     Process.waitall
   end
 end
+
+
+#####################
+# COMPLEX BENCHMARK #
+#####################
+mysql = KvsBenchmarker::MySQLBench.new({
+  :host     => options[:host],
+  :port     => 3306,
+  :database => DB_NAME,
+  :username => 'root',
+  :table    => TABLE_NAME,
+  :sample   => sample
+})
+
+mysql.drop_data
+
+hs = KvsBenchmarker::HandlerSocketBench.new({
+  :host     => options[:host],
+  :port     => HS_RO_PORT,
+  :database => DB_NAME,
+  :table    => TABLE_NAME,
+  :sample   => sample
+})
+Benchmark.bm(30) do |rep|
+  rep.report("mysql2 + HS(#{options[:threads]}process)") do
+    Process.fork() { mysql.set }
+    Process.fork() { options[:size].times { hs.get } }
+    Process.waitall
+  end
+
+end
+
+mysql.close
+hs.close
+
+
+######################
+## COMPLEX BENCHMARK #
+######################
+mysql = KvsBenchmarker::MySQLBench.new({
+  :host     => options[:host],
+  :port     => 3306,
+  :database => DB_NAME,
+  :username => 'root',
+  :table    => TABLE_NAME,
+  :sample   => sample
+})
+mysql.drop_data
+mysql.close
+
+Benchmark.bm(30) do |rep|
+  rep.report("mysql2 + HS(#{options[:threads]}process)") do
+    hs_1 = KvsBenchmarker::HandlerSocketBench.new({
+      :host     => options[:host],
+      :port     => HS_RW_PORT,
+      :database => DB_NAME,
+      :table    => TABLE_NAME,
+      :sample   => sample
+    })
+    Process.fork() { hs_1.set }
+
+    hs_2 = KvsBenchmarker::HandlerSocketBench.new({
+      :host     => options[:host],
+      :port     => HS_RO_PORT,
+      :database => DB_NAME,
+      :table    => TABLE_NAME,
+      :sample   => sample
+    })
+    Process.fork() { options[:size].times { hs_2.get } }
+
+    Process.waitall
+    hs_1.close
+    hs_2.close
+  end
+end
+
 
