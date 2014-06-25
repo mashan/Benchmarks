@@ -53,10 +53,10 @@ module KvsBenchmarker
   class MySQLBench
     def initialize(options = {})
       @client = Mysql2::Client.new(
-        :host     => options[:host],
-        :port     => options[:port],
-        :database => options[:database],
-        :username => options[:username]
+        :host      => options[:host],
+        :port      => options[:port],
+        :database  => options[:database],
+        :username  => options[:username]
       )
       @table = options[:table]
       @sample= options[:sample]
@@ -115,6 +115,21 @@ create table #{@table} (
     def get
       @hs.execute_single(@index_id, '=', [rand(@sample.size + 1)], 1, 0)
     end
+
+    def get_first_record
+      @hs.execute_single(@index_id, '=', [1], 1, 0)
+    end
+
+    def get_slowly
+      @hs.execute_single(@index_id, '=', [rand(@sample.size + 1)], 1, 0)
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split(//)
+    end
+
+    def get_first_record_slowly
+      @hs.execute_single(@index_id, '=', [1], 1, 0)
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split(//)
+    end
+
 
     def get_multi
       condition = [ [@index_id, '=', [rand(@sample.size + 1)], 1, 0] ]
