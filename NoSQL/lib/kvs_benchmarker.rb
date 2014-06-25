@@ -113,7 +113,8 @@ create table #{@table} (
     end
 
     def get
-      @hs.execute_single(@index_id, '=', [rand(@sample.size + 1)], 1, 0)
+      @hs.execute_single(@index_id, '=', [1], 1, 0)
+#      "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz".split(//)
     end
 
     def get_first_record

@@ -257,6 +257,7 @@ Benchmark.bm(40) do |rep|
   end
 end
 
+<<<<<<< HEAD
 puts <<-EOS
 
 ##########################################
@@ -318,6 +319,12 @@ puts <<-EOS
 # COMPLEX BENCHMARK(MySQL Insert + HandlerSocket SELECT #
 #########################################################
 EOS
+=======
+
+#####################
+# COMPLEX BENCHMARK #
+#####################
+>>>>>>> 1bc266e39bda52d0d018bd6f840f455141d9cd89
 mysql = KvsBenchmarker::MySQLBench.new({
   :host     => options[:host],
   :port     => 3306,
@@ -337,6 +344,7 @@ hs = KvsBenchmarker::HandlerSocketBench.new({
   :sample   => sample
 })
 Benchmark.bm(30) do |rep|
+<<<<<<< HEAD
   rep.report("mysql2 + HS") do
     puts
     Process.fork() {
@@ -367,6 +375,23 @@ puts <<-EOS
 # COMPLEX BENCHMARK #
 #####################
 EOS
+=======
+  rep.report("mysql2 + HS(#{options[:threads]}process)") do
+    Process.fork() { mysql.set }
+    Process.fork() { options[:size].times { hs.get } }
+    Process.waitall
+  end
+
+end
+
+mysql.close
+hs.close
+
+
+######################
+## COMPLEX BENCHMARK #
+######################
+>>>>>>> 1bc266e39bda52d0d018bd6f840f455141d9cd89
 mysql = KvsBenchmarker::MySQLBench.new({
   :host     => options[:host],
   :port     => 3306,
@@ -379,7 +404,11 @@ mysql.drop_data
 mysql.close
 
 Benchmark.bm(30) do |rep|
+<<<<<<< HEAD
   rep.report("HS + HS") do
+=======
+  rep.report("mysql2 + HS(#{options[:threads]}process)") do
+>>>>>>> 1bc266e39bda52d0d018bd6f840f455141d9cd89
     hs_1 = KvsBenchmarker::HandlerSocketBench.new({
       :host     => options[:host],
       :port     => HS_RW_PORT,
@@ -404,3 +433,7 @@ Benchmark.bm(30) do |rep|
   end
 end
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1bc266e39bda52d0d018bd6f840f455141d9cd89
